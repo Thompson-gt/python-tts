@@ -1,0 +1,7 @@
+    OPTIONS FOR THE TTS BOT
+-f or --readfile: flag to allow a readable file to be passed to the tts bot
+-m or --message: flag to allow a message to be read by tts bot
+-v or --readervolume: set the volume of the tts bot (0.0-1.0)
+-t or --readertype: set readers gender (0=male, 1=female)
+-r or --rate: set the speed the reader will read at (0-200)
+-u or --url: website to query to read the body text(make sure to wrap in quotes)
