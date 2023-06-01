@@ -6,9 +6,11 @@ import os
 import argparse
 from enum import Enum, auto
 import random
+import time
 #installed
 import requests
 import bs4
+import pyttsx3
 
 #NOTE constants
 #ansi code to reset the terminal color 
@@ -83,7 +85,7 @@ def get_arguments() -> Args:
         p.add_argument("-m","--message",dest="message",default="no message",help="message to read",nargs='+' )
         p.add_argument("-v","--readervolume",dest="readervolume",default="1.0",help="volume of the reader(0.0-1.0)",type=float)
         p.add_argument("-t","--readertype",dest="readertype",default="0",help="gender of the reader(1 or 0)" ,type=int,choices=[1,0])
-        p.add_argument("-r","--rate",dest="rate",default="100",help="how fast for reader to speak" ,type=int)
+        p.add_argument("-r","--rate",dest="rate",default="200",help="how fast for reader to speak" ,type=int)
         p.add_argument("-u","--url",dest="url",default="www.nowhere.com",help="website to query and read" )
         args = p.parse_args()
         return Args(args.readfile,args.message,args.readervolume,args.readertype,args.rate,args.url)
@@ -170,3 +172,21 @@ def colored_print(color: Color, msg:str) -> None:
     if type(msg) != str: raise ValueError("invalid message given, must be of type string")
     if len(msg) <= 0 : raise ValueError("message can not ve empty")
     sys.stdout.write(Color.get_color(color) + msg + COLOR_Reset)
+
+
+# will be the function that takes the text and prints it to the terminal 
+# (should make make one thread for voice reading and another for stdout)
+def voice_to_terminal(text:list[str], speed: int) -> None:
+    for word in text:
+        # ansi code will make sure the full string is printed over 
+        print(" \033[2K read along:{}".format(word), end="\r", flush=True, file=sys.stdout)
+        # needs to sleep by speed divided by 100 (to make it a ones number)
+        # to be in sync with the bots reading speed
+        time.sleep(speed / 100 )
+
+
+# this should take the already configured tts engine and the text to say
+# should simply say the text, need to do this in a fucnion so it can be a thread
+def text_to_speach(text: str, tts: pyttsx3.Engine) -> None:
+    tts.say(text)
+    tts.runAndWait()
