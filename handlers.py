@@ -27,7 +27,6 @@ class Color(Enum):
     BLUE = auto()
     MAGENTA= auto() 
     CYAN = auto()
-    WHITE = auto()
     
     #use a static method to handle the return of the ansi code
     @staticmethod
@@ -38,15 +37,24 @@ class Color(Enum):
         if color == Color.BLUE:return "\u001b[34m"  
         if color == Color.MAGENTA:return "\u001b[35m"  
         if color == Color.CYAN:return "\u001b[36m"  
-        if color == Color.WHITE:return "\u001b[37m"  
     
     @staticmethod
     def random_color() -> Color:
-        return Color(random.randint(1,7))
+        return Color(random.randint(1,6))
 
 #create this so we can type hint the args
 class Args():
-    def __init__(self,readfile:str,message:list[str],volume:float,readertype:int,rate:int,url:str,writer:str) -> None:
+    def __init__(
+        self,
+        readfile:str,
+        message:list[str],
+        volume:float,
+        readertype:int,
+        rate:int,
+        url:str,
+        writer:str,
+        colorWriter:str
+        ) -> None:
         self.readfile = readfile
         self.message = message
         self.readervolume = volume
@@ -54,9 +62,10 @@ class Args():
         self.rate = rate
         self.url = url
         self.writer = writer
+        self.colorWriter = colorWriter
     
     def __repr__(self) -> str:
-        return f"\nfile: {self.readfile} \n message: {self.message} \n volue: {self.readervolume} \n type: {self.readertype} \n rate: {self.rate} \n url: {self.url} \n writer: {self.writer}\n"
+        return f"\nfile: {self.readfile} \n message: {self.message} \n volue: {self.readervolume} \n type: {self.readertype} \n rate: {self.rate} \n url: {self.url} \n writer: {self.writer}\n color: {self.colorWriter} \n"
 
 
     def validate(self,) -> None:
@@ -92,8 +101,9 @@ def get_arguments() -> Args:
         p.add_argument("-r","--rate",dest="rate",default="200",help="how fast for reader to speak" ,type=int)
         p.add_argument("-u","--url",dest="url",default="www.nowhere.com",help="website to query and read" )
         p.add_argument("-w","--writer",dest="writer",default=0,help="have the text printed to the screen when read", action='count')
+        p.add_argument("-c","--color",dest="colorWriter",default=0,help="have the output of the writer be colorful", action='count')
         args = p.parse_args()
-        return Args(args.readfile,args.message,args.readervolume,args.readertype,args.rate,args.url, args.writer)
+        return Args(args.readfile,args.message,args.readervolume,args.readertype,args.rate,args.url, args.writer, args.colorWriter)
     except Exception as e:
         raise ValueError("unsuported argument given", e)
 
@@ -181,13 +191,19 @@ def colored_print(color: Color, msg:str) -> None:
 
 # will be the function that takes the text and prints it to the terminal 
 # (should make make one thread for voice reading and another for stdout)
-def voice_to_terminal(text:list[str], speed: int) -> None:
-    for word in text:
-        # ansi code will make sure the full string is printed over 
-        print(" \033[2K read along:{}".format(word), end="\r", flush=True, file=sys.stdout)
-        # needs to sleep by speed divided by 100 (to make it a ones number)
-        # to be in sync with the bots reading speed
-        time.sleep(speed / 100 )
+def voice_to_terminal(text:list[str], speed:int, color:int) -> None:
+    if len(text) == 0: raise ValueError("text to say must not be empty")
+    if color:
+        for word in text:
+            print(" \033[2K read along: {}".format(Color.get_color(Color.random_color()) + word + COLOR_Reset), end="\r", flush=True, file=sys.stdout)
+            time.sleep(speed / 100 )
+    else:
+        for word in text:
+            # ansi code will make sure the full string is printed over 
+            print(" \033[2K read along: {}".format(word), end="\r", flush=True, file=sys.stdout)
+            # needs to sleep by speed divided by 100 (to make it a ones number)
+            # to be in sync with the bots reading speed
+            time.sleep(speed / 100 )
     return
 
 

@@ -25,7 +25,7 @@ def main() -> None:
         # reader = threading.Thread(target=text_to_speach, args=(text,tts))
         #only create the writer thread if given the flags for it
         if args.writer:
-            writer = threading.Thread(target=voice_to_terminal, args=(text.split(" "), args.rate))
+            writer = threading.Thread(target=voice_to_terminal, args=(text.split(" "), args.rate, args.colorWriter))
             writer.start()
         text_to_speach(text,tts)
     return
