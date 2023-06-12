@@ -46,13 +46,17 @@ class Color(Enum):
 
 #create this so we can type hint the args
 class Args():
-    def __init__(self,readfile:str,message:str,volume:float,readertype:int,rate:int,url:str) -> None:
+    def __init__(self,readfile:str,message:list[str],volume:float,readertype:int,rate:int,url:str,writer:str) -> None:
         self.readfile = readfile
         self.message = message
         self.readervolume = volume
         self.readertype = readertype
         self.rate = rate
         self.url = url
+        self.writer = writer
+    
+    def __repr__(self) -> str:
+        return f"\nfile: {self.readfile} \n message: {self.message} \n volue: {self.readervolume} \n type: {self.readertype} \n rate: {self.rate} \n url: {self.url} \n writer: {self.writer}\n"
 
 
     def validate(self,) -> None:
@@ -87,10 +91,11 @@ def get_arguments() -> Args:
         p.add_argument("-t","--readertype",dest="readertype",default="0",help="gender of the reader(1 or 0)" ,type=int,choices=[1,0])
         p.add_argument("-r","--rate",dest="rate",default="200",help="how fast for reader to speak" ,type=int)
         p.add_argument("-u","--url",dest="url",default="www.nowhere.com",help="website to query and read" )
+        p.add_argument("-w","--writer",dest="writer",default=0,help="have the text printed to the screen when read", action='count')
         args = p.parse_args()
-        return Args(args.readfile,args.message,args.readervolume,args.readertype,args.rate,args.url)
-    except:
-        raise ValueError("unsuported argument given")
+        return Args(args.readfile,args.message,args.readervolume,args.readertype,args.rate,args.url, args.writer)
+    except Exception as e:
+        raise ValueError("unsuported argument given", e)
 
 
 
@@ -104,7 +109,7 @@ def text_to_say(args:Args) -> str:
     if  args.message == "no message" and not args.readfile == ".nowhere" and  args.url == "www.nowhere.com":
         return read_file(args.readfile)
     if  not args.message == "no message" and  args.readfile == ".nowhere" and  args.url == "www.nowhere.com":
-        return args.message
+        return "".join(args.message)
     if not args.url == "www.nowhere.com" and args.message == "no message" and args.readfile == ".nowhere":
         return query_website(args.url)
     return DEFAULT_MESSAGE
@@ -183,6 +188,7 @@ def voice_to_terminal(text:list[str], speed: int) -> None:
         # needs to sleep by speed divided by 100 (to make it a ones number)
         # to be in sync with the bots reading speed
         time.sleep(speed / 100 )
+    return
 
 
 # this should take the already configured tts engine and the text to say
@@ -190,3 +196,4 @@ def voice_to_terminal(text:list[str], speed: int) -> None:
 def text_to_speach(text: str, tts: pyttsx3.Engine) -> None:
     tts.say(text)
     tts.runAndWait()
+    return
