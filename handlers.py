@@ -15,7 +15,7 @@ import pyttsx3
 #NOTE constants
 #ansi code to reset the terminal color 
 COLOR_Reset:Final[str] = "\u001b[0m"
-DEFAULT_MESSAGE:Final[str] = "neither message,url or file was passed to be read, please pass one of them next time"
+DEFAULT_MESSAGE:Final[str] = "neither message,url or file was passed to be read, please pass one of them next time or use the dash help flag for all usage options"
 MESSAGE_PATH:Final[str] = "display.txt"
 
 #a enum to handle all of the color options 
@@ -53,7 +53,8 @@ class Args():
         rate:int,
         url:str,
         writer:str,
-        colorWriter:str
+        colorWriter:str,
+        useHelp:str
         ) -> None:
         self.readfile = readfile
         self.message = message
@@ -63,6 +64,7 @@ class Args():
         self.url = url
         self.writer = writer
         self.colorWriter = colorWriter
+        self.useHelp = useHelp
     
     def __repr__(self) -> str:
         return f"\nfile: {self.readfile} \n message: {self.message} \n volue: {self.readervolume} \n type: {self.readertype} \n rate: {self.rate} \n url: {self.url} \n writer: {self.writer}\n color: {self.colorWriter} \n"
@@ -93,7 +95,7 @@ def read_file(path:str) -> str:
 
 def get_arguments() -> Args:
     try:
-        p = argparse.ArgumentParser()
+        p = argparse.ArgumentParser(add_help=False, exit_on_error=True)
         p.add_argument("-f","--readfile",dest="readfile",default=".nowhere",help="file to read" )
         p.add_argument("-m","--message",dest="message",default="no message",help="message to read",nargs='+' )
         p.add_argument("-v","--readervolume",dest="readervolume",default="1.0",help="volume of the reader(0.0-1.0)",type=float)
@@ -102,10 +104,14 @@ def get_arguments() -> Args:
         p.add_argument("-u","--url",dest="url",default="www.nowhere.com",help="website to query and read" )
         p.add_argument("-w","--writer",dest="writer",default=0,help="have the text printed to the screen when read", action='count')
         p.add_argument("-c","--color",dest="colorWriter",default=0,help="have the output of the writer be colorful", action='count')
+        p.add_argument("-h","--help",dest="useHelp",default=0,help="display all usage options", action='count')
         args = p.parse_args()
-        return Args(args.readfile,args.message,args.readervolume,args.readertype,args.rate,args.url, args.writer, args.colorWriter)
+        return Args(args.readfile,args.message,args.readervolume,args.readertype,args.rate,args.url, args.writer, args.colorWriter, args.useHelp)
+    # catch all of the known errors from the argparser lib so i know what is failing 
+    except (argparse.ArgumentError, argparse.ArgumentTypeError) as e:
+        raise ValueError("error when parsing the flags", e)
     except Exception as e:
-        raise ValueError("unsuported argument given", e)
+        raise ValueError("unknown error raised", e)
 
 
 

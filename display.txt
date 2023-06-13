@@ -5,3 +5,5 @@
 -t or --readertype: set readers gender (0=male, 1=female)
 -r or --rate: set the speed the reader will read at (0-200)
 -u or --url: website to query to read the body text(make sure to wrap in quotes)
+-w, --writer: have the text printed to the screen when read
+-c, --color: have the output of the writer be colorful

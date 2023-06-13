@@ -16,9 +16,10 @@ def main() -> None:
     tts.setProperty('volume',args.readervolume)
     tts.setProperty('voices',tts.getProperty('voices')[args.readertype])
     tts.setProperty('rate',args.rate)
-    #will check the args are return the text to be read
-    if default_args(args): 
+    # if help flag passed then just display the help then exit program
+    if args.useHelp:
         display_help()
+        return
     else:
         text = text_to_say(args)
         #make output while the bot is reading the words, make them read in place 
