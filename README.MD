@@ -1,6 +1,6 @@
 ## **python text to speach**
 
-#### the goal of this project was to have a command line tool that could take in text in multiple ways _i.e files, text or even simple webpages_ then read them aloud.
+#### the goal of this project was to have a command line tool that could take in text in multiple ways _e.g. files, text or even simple webpages_ then read them aloud.
 
 ##### pyttsxs is used as the library to handle the text to speach engine
 
