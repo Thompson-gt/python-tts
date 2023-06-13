@@ -1,4 +1,4 @@
-## **python text to speach cli tool**
+## **python text to speach**
 
 #### the goal of this project was to have a command line tool that could take in text in multiple ways _i.e files, text or even simple webpages_ then read them aloud.
 
